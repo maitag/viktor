@@ -1,0 +1,12 @@
+{
+	"name": "viktor",
+	"url": "https://github.com/maitag/viktor",
+	"license": "MIT",
+	"tags": ["datastructure", "ds", "optimization", "pure", "peote"],
+	"description": "datastructures to store a set of values by id (optimized add/del, slow into iteration instead.)",
+	"version": "0.0.1",
+	"classPath": "src/",
+	"releasenote": "everytime magically again about doing something new^^",
+	"contributors": ["maitag"],
+	"dependencies": {}
+}
