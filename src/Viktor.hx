@@ -116,7 +116,7 @@ class Viktor<T> {
 		@param value value to delete
 	**/
 	public inline function remove(value:T):Int {
-		var i:Int = indexOf(value);
+		var i:Int = key(value);
 		if (i >= 0) del(i);
 		return i;
 	}
@@ -125,7 +125,7 @@ class Viktor<T> {
 		Returns the key of the first value what is found or `-1` instead.
 		@param value value to get key for
 	**/
-	public inline function indexOf(value:T):Int {
+	public inline function key(value:T):Int {
 		var i:Int = 0;		
 		while ( i < pos && get(i) != value) i++;
 		return (i<pos) ? i : -1;
@@ -168,6 +168,7 @@ class ViktorIterator<T> {
 		@param to iteration end value
 	**/
 	public inline function new(viktor:Viktor<T>, from:Int, to:Int) {
+		if (from < 0 || from >= to || to > viktor.size) throw("Iterator out of bounds");
 		this.viktor = viktor;
 		i = from;
 		this.to = to;
@@ -179,7 +180,8 @@ class ViktorIterator<T> {
 		return v;
 	}
 
-	public inline function hasNext():Bool return (i < to);
+	@:access(Viktor)
+	public inline function hasNext():Bool return (i < to && viktor.posFree < viktor.size);
 }
 
 class ViktorKeyValueIterator<T> {
@@ -195,6 +197,7 @@ class ViktorKeyValueIterator<T> {
 		@param to iteration end value
 	**/
 	public inline function new(viktor:Viktor<T>, from:Int, to:Int) {
+		if (from < 0 || from >= to || to > viktor.size) throw("Iterator out of bounds");
 		this.viktor = viktor;
 		i = from;
 		this.to = to;
@@ -206,5 +209,6 @@ class ViktorKeyValueIterator<T> {
 		return {key:i-1, value:v};
 	}
 
-	public inline function hasNext():Bool return (i < to);
+	@:access(Viktor)
+	public inline function hasNext():Bool return (i < to && viktor.posFree < viktor.size);
 }
