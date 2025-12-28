@@ -29,9 +29,11 @@ class ViktorMacro
 
 				if (typeParams.length > 1) Context.error("Only one Type parameter expected", Context.currentPos());
 				var type = typeParams[0];
+
 				switch (type) 
 				{
 					case TAbstract(n,[]):
+						
 						var name = n.get().name;
 						if ( name == "Int" || name == "UInt")
 						{	
