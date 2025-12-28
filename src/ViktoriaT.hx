@@ -47,12 +47,14 @@ class ViktoriaT<T> {
 	}
 
 	/**
-		Sets the value to a key. If the key not exists and `checkValidKey` is true (default) it adds a new one!
+		Sets the value to a key.
+		If the key does not exist and `checkValidKey` is false (default) it will lead to an unpredictable result.
+		If `checkValidKey` is enabled it automatically adds a new key into this case.
 		@param key integer key
-		@param key value
-		@param checkValidKey true by default, disable this for an unsafe operation, e.g. to fast replace a value
+		@param value value of type T
+		@param checkValidKey false by default, enable this for an slower but safe operation if the case occurs where the key does not exist
 	**/
-	public inline function set(key:Int, value:T, checkValidKey:Bool = true) {
+	public inline function set(key:Int, value:T, checkValidKey:Bool = false) {
 		if (checkValidKey) {
 			if (key < 0 || key > pos || pos == size) throw("OutOfRange");
 			if (key == pos) pos++;
@@ -101,9 +103,10 @@ class ViktoriaT<T> {
 
 	/**
 		Deletes the value by its key (frees the key for re-usage).
-		By default it not check key existence and can be unsafe,
-		so set the `checkValidKey` to true for debugging!
+		By default it does not check that the key exists and can be unsafe,
+		so set the `checkValidKey` to true to throw and error into this case!
 		@param key integer key
+		@param checkValidKey false by default, enable this for an safe operation
 	**/
 	public inline function del(key:Int, checkValidKey:Bool = false) {
 		if (checkValidKey && !exist(key)) throw("key not exists");

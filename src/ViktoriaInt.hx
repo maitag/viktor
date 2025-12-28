@@ -3,12 +3,11 @@ package;
 import haxe.ds.Vector;
 
 /**
-	This datastructure is to store positive integer values mapped by a integer key.
-	The value `-1` indicates that the key not exists.
+	This datastructure is to store integer values mapped by a integer key.
 	Its optimized for fast add/delete operations by the key.
 	Operations like remove(), indexOf() or iteration over key/values is slow instead.
 **/
-class ViktorInt {
+class ViktoriaInt {
 
 	/**
 		The value to determine that it not exists.
@@ -32,7 +31,7 @@ class ViktorInt {
 	inline function get_length():Int return pos - (posFree-size + 1);
 
 	/**
-		Creates a new ViktorInt instance.
+		Creates a new ViktoriaInt instance.
 		@param size maximum size (greatest key will be size-1)
 	**/
 	public inline function new(size:Int) {
@@ -79,7 +78,6 @@ class ViktorInt {
 		@returns key where the value is mapped to
 	**/
 	public inline function add(value:Int):Int {
-		if (value == NULL) throw('values in ViktorInt can not be "$NULL", use ViktoriaT instead'); // TODO: by compiler define!		
 		if (posFree < size) {
 			if (pos == size) throw("Overflow"); // TODO: by compiler define!
 			list.set(pos, value);
@@ -97,7 +95,11 @@ class ViktorInt {
 		@param key integer key
 	**/
 	public inline function exist(key:Int):Bool {
-		return (key >= 0 && key < pos && get(key) != NULL);
+		if (key < 0 || key >= pos) return false;
+		var i=size;
+		while (i <= posFree && list.get(i) != key) i++;
+		if (i <= posFree) return false;
+		return true;
 	}
 
 	/**
@@ -109,9 +111,6 @@ class ViktorInt {
 	**/
 	public inline function del(key:Int, checkValidKey:Bool = false) {
 		if (checkValidKey && !exist(key)) throw("key not exists");
-		
-		list.set(key, NULL);
-
 		if (key == pos-1) {
 			pos--;
 		}
@@ -146,17 +145,17 @@ class ViktorInt {
 	// ------------------- ITERATORS ---------------------
 
 	/**
-		Returns a new ViktorIntIterator to use in `for (value in viktorInt)` loops.
+		Returns a new ViktoriaIntIterator to use in `for (value in viktoriaInt)` loops.
 	**/	
-	public inline function iterator():ViktorIntIterator {
-		return new ViktorIntIterator(this, 0, pos);
+	public inline function iterator():ViktoriaIntIterator {
+		return new ViktoriaIntIterator(this, 0, pos);
 	}
 
 	/**
-		Returns a new ViktorIntKeyValueIterator to use in `for (value in viktorInt)` loops.
+		Returns a new ViktoriaIntKeyValueIterator to use in `for (value in viktoriaInt)` loops.
 	**/	
-	public inline function keyValueIterator():ViktorIntKeyValueIterator {
-		return new ViktorIntKeyValueIterator(this, 0, pos);
+	public inline function keyValueIterator():ViktoriaIntKeyValueIterator {
+		return new ViktoriaIntKeyValueIterator(this, 0, pos);
 	}
 
 }
@@ -166,60 +165,60 @@ class ViktorInt {
 // ------------------- ITERATORS ---------------------
 // ---------------------------------------------------
 
-class ViktorIntIterator {
+class ViktoriaIntIterator {
 
-	var viktorInt:ViktorInt;
+	var viktoriaInt:ViktoriaInt;
 	var i:Int;
 	var to:Int;
 
 	/**
-		Creates a new `ViktorIntIterator` instance.
-		@param viktorInt viktorInt reference
+		Creates a new `ViktoriaIntIterator` instance.
+		@param viktoriaInt viktoriaInt reference
 		@param from iteration start value
 		@param to iteration end value
 	**/
-	public inline function new(viktorInt:ViktorInt, from:Int, to:Int) {
-		if (from < 0 || from >= to || to > viktorInt.size) throw("Iterator out of bounds");
-		this.viktorInt = viktorInt;
+	public inline function new(viktoriaInt:ViktoriaInt, from:Int, to:Int) {
+		if (from < 0 || from >= to || to > viktoriaInt.size) throw("Iterator out of bounds");
+		this.viktoriaInt = viktoriaInt;
 		i = from;
 		this.to = to;
 	}
 
-	public inline function next():Int {
-		var v:Int = viktorInt.get(i++);
-		while ( v == ViktorInt.NULL) v = viktorInt.get(i++);
-		return v;
-	}
+	public inline function next():Int return viktoriaInt.get(i++);
 
-	@:access(ViktorInt)
-	public inline function hasNext():Bool return (i < to && viktorInt.posFree < viktorInt.list.length);
+	@:access(ViktoriaInt)
+	public inline function hasNext():Bool {
+		if (viktoriaInt.posFree >= viktoriaInt.list.length) return false;
+		while (i < to && !viktoriaInt.exist(i)) i++;
+		if (i < to) return true else return false;
+	}
 }
 
-class ViktorIntKeyValueIterator {
+class ViktoriaIntKeyValueIterator {
 
-	var viktorInt:ViktorInt;
+	var viktoriaInt:ViktoriaInt;
 	var i:Int;
 	var to:Int;
 
 	/**
-		Creates a new `ViktorIntKeyValueIterator` instance.
-		@param viktorInt viktorInt reference
+		Creates a new `ViktoriaIntKeyValueIterator` instance.
+		@param viktoriaInt viktoriaInt reference
 		@param from iteration start value
 		@param to iteration end value
 	**/
-	public inline function new(viktorInt:ViktorInt, from:Int, to:Int) {
-		if (from < 0 || from >= to || to > viktorInt.size) throw("Iterator out of bounds");
-		this.viktorInt = viktorInt;
+	public inline function new(viktoriaInt:ViktoriaInt, from:Int, to:Int) {
+		if (from < 0 || from >= to || to > viktoriaInt.size) throw("Iterator out of bounds");
+		this.viktoriaInt = viktoriaInt;
 		i = from;
 		this.to = to;
 	}
 
-	public inline function next():{key:Int, value:Int} {
-		var v:Int = viktorInt.get(i++);
-		while ( v == ViktorInt.NULL) v = viktorInt.get(i++);
-		return {key:i-1, value:v};
-	}
+	public inline function next():{key:Int, value:Int} return {key:i, value:viktoriaInt.get(i++)};
 
-	@:access(ViktorInt)
-	public inline function hasNext():Bool return (i < to && viktorInt.posFree < viktorInt.list.length);
+	@:access(ViktoriaInt)
+	public inline function hasNext():Bool {
+		if (viktoriaInt.posFree >= viktoriaInt.list.length) return false;
+		while (i < to && !viktoriaInt.exist(i)) i++;
+		if (i < to) return true else return false;
+	}
 }

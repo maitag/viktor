@@ -3,7 +3,8 @@ package;
 import haxe.ds.Vector; // Viktors little friend .)
 
 /**
-	This datastructure is to store values mapped by a integer key.
+	This datastructure is to store values of type <T> mapped by a integer key.
+	The value `null` indicates that the key not exists.
 	Its optimized for fast add/delete operations by the key.
 	Operations like remove(), indexOf() or iteration over key/values is slow instead.
 **/
@@ -46,11 +47,13 @@ class ViktorT<T> {
 
 	/**
 		Sets the value to a key.
+		If the key does not exist and `checkValidKey` is false (default) it will lead to an unpredictable result.
+		If `checkValidKey` is enabled it automatically adds a new key into this case.
 		@param key integer key
-		@param key value
-		@param checkValidKey true by default, disable this for an unsafe operation, e.g. to fast replace a value
+		@param value value of type T
+		@param checkValidKey false by default, enable this for an slower but safe operation if the case occurs where the key does not exist
 	**/
-	public inline function set(key:Int, value:T, checkValidKey:Bool = true) {
+	public inline function set(key:Int, value:T, checkValidKey:Bool = false) {
 		if (checkValidKey) {
 			if (key < 0 || key > pos || pos == size) throw("OutOfRange");
 			if (key == pos) pos++;
@@ -73,8 +76,9 @@ class ViktorT<T> {
 		@returns key where the value is mapped to
 	**/
 	public inline function add(value:T):Int {
+		if (value == null) throw("values in ViktorT can not be 'null', use ViktoriaT instead"); // TODO: by compiler define!
 		if (posFree == -1) {
-			if (pos == size) throw("Overflow");
+			if (pos == size) throw("Overflow"); // TODO: by compiler define!
 			list.set(pos, value);
 			return pos++;
 		}
@@ -90,17 +94,21 @@ class ViktorT<T> {
 		@param key integer key
 	**/
 	public inline function exist(key:Int):Bool {
-		return (get(key) != null);
+		return (key >= 0 && key < pos && get(key) != null);
 	}
 
 	/**
 		Deletes the value by its key (frees the key for re-usage).
+		By default it does not check that the key exists and can be unsafe,
+		so set the `checkValidKey` to true to throw and error into this case!
 		@param key integer key
+		@param checkValidKey false by default, enable this for an safe operation
 	**/
-	public inline function del(key:Int) {
-		// if (key < 0 || key >= pos) throw("OutOfRange");
-		list.set(key, null);
+	public inline function del(key:Int, checkValidKey:Bool = false) {
+		if (checkValidKey && !exist(key)) throw("key not exists");
 
+		list.set(key, null);
+		
 		if (key == pos-1) {
 			pos--;
 		}
@@ -111,7 +119,7 @@ class ViktorT<T> {
 	}
 	
 	/**
-		Deletes a value if found and returns its key.
+		Deletes a value if found and returns its key or `-1` if not found.
 		If more then one of same values exists it returs the one with the higher key value.
 		@param value value to delete
 	**/
@@ -135,17 +143,17 @@ class ViktorT<T> {
 	// ------------------- ITERATORS ---------------------
 
 	/**
-		Returns a new ViktorIterator to use in `for (value in viktor)` loops.
+		Returns a new ViktorTIterator to use in `for (value in viktor)` loops.
 	**/
-	public inline function iterator():ViktorIterator<T> {
-		return new ViktorIterator<T>(this, 0, pos);
+	public inline function iterator():ViktorTIterator<T> {
+		return new ViktorTIterator<T>(this, 0, pos);
 	}
 
 	/**
-		Returns a new ViktorKeyValueIterator to use in `for (value in viktor)` loops.
+		Returns a new ViktorTKeyValueIterator to use in `for (value in viktor)` loops.
 	**/
-	public inline function keyValueIterator():ViktorKeyValueIterator<T> {
-		return new ViktorKeyValueIterator<T>(this, 0, pos);
+	public inline function keyValueIterator():ViktorTKeyValueIterator<T> {
+		return new ViktorTKeyValueIterator<T>(this, 0, pos);
 	}
 
 }
@@ -155,14 +163,14 @@ class ViktorT<T> {
 // ------------------- ITERATORS ---------------------
 // ---------------------------------------------------
 
-class ViktorIterator<T> {
+class ViktorTIterator<T> {
 
 	var viktor:ViktorT<T>;
 	var i:Int;
 	var to:Int;
 
 	/**
-		Creates a new `ViktorIterator<T>` instance.
+		Creates a new `ViktorTIterator<T>` instance.
 		@param viktor viktor reference
 		@param from iteration start value
 		@param to iteration end value
@@ -184,14 +192,14 @@ class ViktorIterator<T> {
 	public inline function hasNext():Bool return (i < to && viktor.posFree < viktor.size);
 }
 
-class ViktorKeyValueIterator<T> {
+class ViktorTKeyValueIterator<T> {
 
 	var viktor:ViktorT<T>;
 	var i:Int;
 	var to:Int;
 
 	/**
-		Creates a new `ViktorKeyValueIterator<T>` instance.
+		Creates a new `ViktorTKeyValueIterator<T>` instance.
 		@param viktor viktor reference
 		@param from iteration start value
 		@param to iteration end value
