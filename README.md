@@ -15,7 +15,6 @@ haxelib git viktor https://github.com/maitag/viktor.git
 ## Todo
 
 - synopsis
-- new types what not indicate values by `null` or `-1` if they gets deleted (on cost of iteration speed)
 - more backends what using Bytes instead of Vector
 - unit tests, benchmarks, hxp, optimization
   
