@@ -38,47 +38,17 @@ class ViktorT<T> {
 	}
 
 	/**
-		Get the value to a key or returns `null` if not found.
-		@param key integer key
-	**/
-	public inline function get(key:Int):T {
-		return list.get(key);
-	}
-
-	/**
-		Sets the value to a key.
-		If the key does not exist and `checkValidKey` is false (default) it will lead to an unpredictable result.
-		If `checkValidKey` is enabled it automatically adds a new key into this case.
-		@param key integer key
-		@param value value of type T
-		@param checkValidKey false by default, enable this for an slower but safe operation if the case occurs where the key does not exist
-	**/
-	public inline function set(key:Int, value:T, checkValidKey:Bool = false) {
-		if (checkValidKey) {
-			if (key < 0 || key > pos || pos == size) throw("OutOfRange");
-			if (key == pos) pos++;
-			else if (posFree >= 0) { // check if it is inside freeKeys and remove it there
-				var i:Int = 0;
-				while (i <= posFree && freeKeys.get(i) != key) i++;
-				if (i <= posFree) {
-					if (i < posFree) freeKeys.set( i, freeKeys.get(posFree) );
-					posFree--;
-				}
-			}
-		}
-		list.set(key, value);
-	}
-
-	/**
-		Adds a new value and returns a new available key.
-		@param value value to add
-		@throws Overflow if there is no more free space
-		@returns key where the value is mapped to
+		Adds a value and returns the corresponding new key.
+		@param value value of type `T`
 	**/
 	public inline function add(value:T):Int {
-		if (value == null) throw("values in ViktorT can not be 'null', use ViktoriaT instead"); // TODO: by compiler define!
+		#if !viktor_unsafe
+		if (value == null) throw("Values in ViktorT can not be 'null', use ViktoriaT instead!");
+		#end
 		if (posFree == -1) {
-			if (pos == size) throw("Overflow"); // TODO: by compiler define!
+			#if !viktor_unsafe
+			if (pos == size) throw("No free key avail.");
+			#end 
 			list.set(pos, value);
 			return pos++;
 		}
@@ -90,38 +60,47 @@ class ViktorT<T> {
 	}
 
 	/**
-		Returns true if a value to the key exists.
-		@param key integer key
+		Get the value to a key or returns `null` if not found.
+		@param key existing key of type `Int`
 	**/
-	public inline function exist(key:Int):Bool {
-		return (key >= 0 && key < pos && get(key) != null);
+	public inline function get(key:Int):T {
+		#if !viktor_unsafe
+		if (key < 0 || key >= size) throw("Key out of range.");
+		#end
+		return list.get(key);
 	}
 
 	/**
-		Deletes the value by its key (frees the key for re-usage).
-		By default it does not check that the key exists and can be unsafe,
-		so set the `checkValidKey` to true to throw and error into this case!
-		@param key integer key
-		@param checkValidKey false by default, enable this for an safe operation
+		Sets the value to a existing key.
+		If the compiler flag `viktor_unsafe` is set and the key does not exist, this leads to an unpredictable result; otherwise, an error is thrown.
+		@param key existing key of type `Int`
+		@param value value of type `T`
 	**/
-	public inline function del(key:Int, checkValidKey:Bool = false) {
-		if (checkValidKey && !exist(key)) throw("key not exists");
+	public inline function set(key:Int, value:T) {
+		#if !viktor_unsafe
+		if (!exist(key)) throw("The key must already exist to set a new value.");
+		#end
+		list.set(key, value);
+	}
 
+	/**
+		Deletes the value by setting it to `null` and releases the key for reuse.
+		If the compiler flag `viktor_unsafe` is set and the key does not exist, this leads to an unpredictable result; otherwise, an error is thrown.
+		@param key existing key of type `Int`
+	**/
+	public inline function del(key:Int) {
+		#if viktor_unsafe
+		if (!exist(key)) throw("The key must already exist to delete it.");
+		#end
 		list.set(key, null);
-		
-		if (key == pos-1) {
-			pos--;
-		}
-		else {
-			// if (posFree >= freeKeys.length) throw("'del' freeKeys OVERFLOW");
-			freeKeys.set(++posFree, key);
-		}
+		if (key == pos-1) pos--;
+		else freeKeys.set(++posFree, key);
 	}
 	
 	/**
-		Deletes a value if found and returns its key or `-1` if not found.
-		If more then one of same values exists it returs the one with the higher key value.
-		@param value value to delete
+		Deletes a value and returns its key or `-1` if it is not found.
+		If the value exists multiple times, the one with the lowest key is deleted.
+		@param value value of type `T`
 	**/
 	public inline function remove(value:T):Int {
 		var i:Int = key(value);
@@ -131,12 +110,63 @@ class ViktorT<T> {
 
 	/**
 		Returns the key of the first value what is found or `-1` instead.
-		@param value value to get key for
+		@param value value of type `T`
 	**/
 	public inline function key(value:T):Int {
+		#if !viktor_unsafe
+		if (value == null) throw("Values in ViktorT can not be 'null', use ViktoriaT instead!");
+		#end
 		var i:Int = 0;		
 		while ( i < pos && get(i) != value) i++;
 		return (i<pos) ? i : -1;
+	}
+
+	/**
+		Returns true if a key exists.
+		@param key key of type `Int`
+	**/
+	public inline function exist(key:Int):Bool {
+		#if !viktor_unsafe
+		if (key < 0 || key >= size) throw("Key out of range.");
+		#end 
+		return (key < pos && get(key) != null);
+	}
+
+	/**
+		Adds a new key and value. This function is very slow and should only be used for debugging purposes.
+		If the key already exists, the value for that key will be replaced.
+		@param key key of type `Int`
+		@param value value of type `T`
+	**/
+	public inline function addKeyValue(key:Int, value:T) {
+		if (value == null) throw("Values in ViktorT can not be 'null', use ViktoriaT instead!");
+		if (!exist(key)) {
+			if (key == pos) pos++;
+			else if (key > pos) {
+				do { // fill up new free keys until not reaching the new one
+					list.set(pos, null);
+					freeKeys.set(++posFree, pos);
+					pos++;
+				} while (pos < key);
+				pos++;
+			}
+			else { // check inside freeKeys and remove it if found
+				var i:Int = 0;
+				while (i <= posFree && freeKeys.get(i) != key) i++;
+				if (i <= posFree) {
+					if (i < posFree) freeKeys.set(i, freeKeys.get(posFree)); // replace it with the last free key
+					posFree--;
+				}
+			}
+		}
+		list.set(key, value);
+	}
+
+	/**
+		Returns all key/value pairs as string representation.
+	**/
+	public inline function toString():String {
+		return "[" + [for (k=>v in this) '$k=>$v'].join(",") + "]";
 	}
 
 
@@ -176,7 +206,9 @@ class ViktorTIterator<T> {
 		@param to iteration end value
 	**/
 	public inline function new(viktor:ViktorT<T>, from:Int, to:Int) {
-		if (from < 0 || from >= to || to > viktor.size) throw("Iterator out of bounds");
+		#if !viktor_unsafe
+		if (from < 0 || from >= to || to > viktor.size) throw("Iterator out of bounds.");
+		#end
 		this.viktor = viktor;
 		i = from;
 		this.to = to;
@@ -205,7 +237,9 @@ class ViktorTKeyValueIterator<T> {
 		@param to iteration end value
 	**/
 	public inline function new(viktor:ViktorT<T>, from:Int, to:Int) {
-		if (from < 0 || from >= to || to > viktor.size) throw("Iterator out of bounds");
+		#if !viktor_unsafe
+		if (from < 0 || from >= to || to > viktor.size) throw("Iterator out of bounds.");
+		#end
 		this.viktor = viktor;
 		i = from;
 		this.to = to;
