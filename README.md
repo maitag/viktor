@@ -21,7 +21,7 @@ Viktor<UInt>   ->  ViktorInt
 Viktor<Bool>   ->  ViktorT<Null<Bool>>
 Viktor<Float>  ->  ViktorT<Null<Float>>
 ```
-```
+```hx
 Viktoria<Int>   ->  ViktoriaInt
 Viktoria<UInt>  ->  ViktoriaInt
 ```
@@ -90,7 +90,7 @@ trace(viktor.length); // -> 2
 ## Todo
 
 - more into synapsis
-- more backends what using Bytes instead of Vector
-- unit tests, benchmarks, hxp, optimization
-  
+- more unit tests and benchmarks
+- using Bytes and target specific backends instead of the Vector
+
   
