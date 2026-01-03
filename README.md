@@ -1,6 +1,6 @@
 # Viktor
 is a haxe datastructure that maps positive integer keys to values stored in a normal `Vector`.  
-It is optimised for quickly adding values, returning a free key and quickly deleting those values with that key.  
+It is optimised for quickly adding values, returning a free key and quickly deleting those immediately.  
 The free keys are stored separately and are used as a priority when adding new keys/values.  
   
 So only some _optimizationTHING(^_^)_ ~~^^
