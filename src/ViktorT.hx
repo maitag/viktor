@@ -42,11 +42,11 @@ class ViktorT<T> {
 		@param value value of type `T`
 	**/
 	public inline function add(value:T):Int {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (value == null) throw("Values in ViktorT can not be 'null', use ViktoriaT instead!");
 		#end
 		if (posFree == -1) {
-			#if !viktor_unsafe
+			#if viktor_safe
 			if (pos == size) throw("No free key avail.");
 			#end 
 			list.set(pos, value);
@@ -64,7 +64,7 @@ class ViktorT<T> {
 		@param key existing key of type `Int`
 	**/
 	public inline function get(key:Int):T {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (key < 0 || key >= size) throw("Key out of range.");
 		#end
 		return list.get(key);
@@ -72,12 +72,12 @@ class ViktorT<T> {
 
 	/**
 		Sets the value to a existing key.
-		If the compiler flag `viktor_unsafe` is set and the key does not exist, this leads to an unpredictable result; otherwise, an error is thrown.
+		If the key does not exist, this leads to an unpredictable result. Use the `viktor_safe` compiler flag to catch this.
 		@param key existing key of type `Int`
 		@param value value of type `T`
 	**/
 	public inline function set(key:Int, value:T) {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (!exist(key)) throw("The key must already exist to set a new value.");
 		#end
 		list.set(key, value);
@@ -85,11 +85,11 @@ class ViktorT<T> {
 
 	/**
 		Deletes the value by setting it to `null` and releases the key for reuse.
-		If the compiler flag `viktor_unsafe` is set and the key does not exist, this leads to an unpredictable result; otherwise, an error is thrown.
+		If the key does not exist, this leads to an unpredictable result. Use the `viktor_safe` compiler flag to catch this.
 		@param key existing key of type `Int`
 	**/
 	public inline function del(key:Int) {
-		#if viktor_unsafe
+		#if viktor_safe
 		if (!exist(key)) throw("The key must already exist to delete it.");
 		#end
 		list.set(key, null);
@@ -113,7 +113,7 @@ class ViktorT<T> {
 		@param value value of type `T`
 	**/
 	public inline function key(value:T):Int {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (value == null) throw("Values in ViktorT can not be 'null', use ViktoriaT instead!");
 		#end
 		var i:Int = 0;		
@@ -126,7 +126,7 @@ class ViktorT<T> {
 		@param key key of type `Int`
 	**/
 	public inline function exist(key:Int):Bool {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (key < 0 || key >= size) throw("Key out of range.");
 		#end 
 		return (key < pos && get(key) != null);
@@ -206,7 +206,7 @@ class ViktorTIterator<T> {
 		@param to iteration end value
 	**/
 	public inline function new(viktor:ViktorT<T>, from:Int, to:Int) {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (from < 0 || from >= to || to > viktor.size) throw("Iterator out of bounds.");
 		#end
 		this.viktor = viktor;
@@ -237,7 +237,7 @@ class ViktorTKeyValueIterator<T> {
 		@param to iteration end value
 	**/
 	public inline function new(viktor:ViktorT<T>, from:Int, to:Int) {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (from < 0 || from >= to || to > viktor.size) throw("Iterator out of bounds.");
 		#end
 		this.viktor = viktor;

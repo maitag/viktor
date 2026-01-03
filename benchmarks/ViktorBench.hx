@@ -21,7 +21,7 @@ class ViktorBench {
 		// test deparate add, get, del and exist
 		
 		time = Std.int((Timer.stamp() - time)*1000);
-		#if !viktor_unsafe
+		#if viktor_safe
 		haxe.Log.trace("safe mode");
 		#end
 

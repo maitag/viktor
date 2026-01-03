@@ -45,11 +45,11 @@ class ViktorInt {
 		@param value value of type `T`
 	**/
 	public inline function add(value:Int):Int {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (value == NULL) throw('Values in ViktorInt can not be "$NULL", use ViktoriaInt instead');	
 		#end
 		if (posFree < size) {
-			#if !viktor_unsafe
+			#if viktor_safe
 			if (pos == size) throw("No free key avail.");
 			#end
 			list.set(pos, value);
@@ -67,7 +67,7 @@ class ViktorInt {
 		@param key existing key of type `Int`
 	**/
 	public inline function get(key:Int):Int {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (key < 0 || key >= size) throw("Key out of range.");
 		#end
 		return (key < pos) ? list.get(key) : -1;
@@ -75,12 +75,12 @@ class ViktorInt {
 
 	/**
 		Sets the value to a existing key.
-		If the compiler flag `viktor_unsafe` is set and the key does not exist, this leads to an unpredictable result; otherwise, an error is thrown.
+		If the key does not exist, this leads to an unpredictable result. Use the `viktor_safe` compiler flag to catch this.
 		@param key existing key of type `Int`
 		@param value value of type `Int`
 	**/
 	public inline function set(key:Int, value:Int) {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (value == NULL) throw('values in ViktorInt can not be "$NULL", use ViktoriaInt instead');	
 		if (!exist(key)) throw("The key must already exist to set a new value.");
 		#end
@@ -89,11 +89,11 @@ class ViktorInt {
 
 	/**
 		Deletes the value by setting it to `-1` and releases the key for reuse.
-		If the compiler flag `viktor_unsafe` is set and the key does not exist, this leads to an unpredictable result; otherwise, an error is thrown.
+		If the key does not exist, this leads to an unpredictable result. Use the `viktor_safe` compiler flag to catch this.
 		@param key existing key of type `Int`
 	**/
 	public inline function del(key:Int) {
-		#if viktor_unsafe
+		#if viktor_safe
 		if (!exist(key)) throw("The key must already exist to delete it.");
 		#end
 		if (key == pos-1) pos--;
@@ -119,7 +119,7 @@ class ViktorInt {
 		@param value value of type `Int`
 	**/
 	public inline function key(value:Int):Int {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (value == NULL) throw('Values in ViktorInt can not be "$NULL", use ViktoriaInt instead');	
 		#end
 		var i:Int = 0;		
@@ -132,7 +132,7 @@ class ViktorInt {
 		@param key key of type `Int`
 	**/
 	public inline function exist(key:Int):Bool {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (key < 0 || key >= size) throw("Key out of range.");
 		#end 
 		return (key < pos && get(key) != NULL);

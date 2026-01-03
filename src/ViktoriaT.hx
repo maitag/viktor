@@ -43,7 +43,7 @@ class ViktoriaT<T> {
 	**/
 	public inline function add(value:T):Int {
 		if (posFree == -1) {
-			#if !viktor_unsafe
+			#if viktor_safe
 			if (pos == size) throw("No free key avail.");
 			#end 
 			list.set(pos, value);
@@ -62,7 +62,7 @@ class ViktoriaT<T> {
 		@param key existing key of type `Int`
 	**/
 	public inline function get(key:Int):T {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (key < 0 || key >= size) throw("Key out of range.");
 		#end
 		return list.get(key);
@@ -70,12 +70,12 @@ class ViktoriaT<T> {
 
 	/**
 		Sets the value to a existing key.
-		If the compiler flag `viktor_unsafe` is set and the key does not exist, this leads to an unpredictable result; otherwise, an error is thrown.
+		If the key does not exist, this leads to an unpredictable result. Use the `viktor_safe` compiler flag to catch this.
 		@param key existing key of type `Int`
 		@param value value of type `T`
 	**/
 	public inline function set(key:Int, value:T) {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (!exist(key)) throw("The key must already exist to set a new value.");
 		#end
 		list.set(key, value);
@@ -83,11 +83,11 @@ class ViktoriaT<T> {
 
 	/**
 		Deletes the value and releases the key for reuse.
-		If the compiler flag `viktor_unsafe` is set and the key does not exist, this leads to an unpredictable result; otherwise, an error is thrown.
+		If the key does not exist, this leads to an unpredictable result. Use the `viktor_safe` compiler flag to catch this.
 		@param key existing key of type `Int`
 	**/
 	public inline function del(key:Int) {
-		#if viktor_unsafe
+		#if viktor_safe
 		if (!exist(key)) throw("The key must already exist to delete it.");
 		#end
 		if (key == pos-1) pos--;
@@ -120,7 +120,7 @@ class ViktoriaT<T> {
 		@param key key of type `Int`
 	**/
 	public inline function exist(key:Int):Bool {
-		#if !viktor_unsafe
+		#if viktor_safe
 		if (key < 0 || key >= size) throw("Key out of range.");
 		#end 
 		if (key >= pos) return false;
