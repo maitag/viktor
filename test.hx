@@ -27,6 +27,7 @@ class Test extends hxp.Script {
 		if (targets.indexOf('all') != -1) {
 			targets[targets.indexOf('all')] = 'neko';
 			targets = targets.concat(['hl','js','cpp']);
+			//TODO: targets = targets.concat(['hl','hlc','js','cpp']);
 		}
 		
 		// remove double targets
@@ -67,6 +68,7 @@ class Test extends hxp.Script {
 						}
 					}
 					if (targets.length == 0) targets = ['neko', 'hl', 'js', 'cpp'];
+					//TODO: if (targets.length == 0) targets = ['neko', 'hl', 'hlc', 'js', 'cpp'];
 					if (benchmark_select.length != 0) benchmarks = benchmark_select;
 					if (benchmarks.length != 0)	benchmark(targets, benchmarks);
 					else Log.error("No .hx files into 'benchmarks' folder");
@@ -74,7 +76,8 @@ class Test extends hxp.Script {
 				else Log.error("No 'benchmarks' directory found");
 				
 			default:
-				Log.error("Expected \"hxp <test|(bench|benchmark <Simple>)> <all|neko|hl|js|cpp>\"");
+				Log.error("Expected \"hxp <help|test|(bench <ViktorBench>)> <all|neko|hl|js|cpp>\"");
+				//TODO: Log.error("Expected \"hxp <test|(bench|benchmark <Simple>)> <all|neko|hl|hlc|js|cpp>\"");
 		}
 		
 	}
@@ -157,6 +160,14 @@ class Test extends hxp.Script {
 				hl.hl = 'bin/hl/${base.main.toLowerCase()}.hl';
 				hl.build();				
 			
+			// TODO:
+			/*
+			case "hlc":
+				var hlc = base.clone();
+				hlc.hlc = 'bin/hlc';
+				hlc.build();				
+			*/
+
 			case "node"|"js":
 				var node = base.clone();
 				node.js = 'bin/node/${base.main.toLowerCase()}.js';
@@ -215,6 +226,19 @@ class Test extends hxp.Script {
 					}
 				}
 			
+			// TODO:
+			/*
+			case "hlc":
+				if (System.hostPlatform == WINDOWS) {
+					if (base.debug) System.runCommand ("bin/hlc",  '${base.main}-debug.exe', []);
+					else System.runCommand ("bin/hlc",  '${base.main}.exe', []);
+				}
+				else {
+					if (base.debug) System.runCommand ("bin/hlc",  './${base.main}-debug', []);
+					else System.runCommand ("bin/hlc",  './${base.main}', []);
+				}
+			*/
+
 			case "node"|"js":
 				System.runCommand ("bin/node", "node", [ '${base.main.toLowerCase()}.js' ]);
 			
