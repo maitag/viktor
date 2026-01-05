@@ -13,20 +13,60 @@ class ViktorBench {
 
     public static function main() 
 	{
-		var v = new ViktorT<String>(1024);
+		var size = 16384;
+		var v = new ViktorT<String>(size);
 		
-		var time = Timer.stamp();
+		var time:Float = 0;
+		var add_time:Float = 0;
+		var del_time:Float = 0;
+
+		var add:Int = 0;
+		var del:Int = 0;
 		
-		// TODO !!!!!
-		// test deparate add, get, del and exist
+		for (j in 0...128) {
+			
+			// fill it fully:
+			for (i in 0...size) {
+				time = Timer.stamp(); v.add("a"); add_time += Timer.stamp() - time; add++;
+			}
+
+			// delete every second key:
+			var k:Int = 0;
+			while (k < size) {
+				time = Timer.stamp(); v.del(k); del_time += Timer.stamp() - time; del++;
+				k +=2;
+			}
+
+			// fill again:
+			for (i in 0...size>>1) {
+				time = Timer.stamp(); v.add("b"); add_time += Timer.stamp() - time; add++;
+			}
+
+			// delete every second key:
+			var k:Int = 1;
+			while (k < size) {
+				time = Timer.stamp(); v.del(k); del_time += Timer.stamp() - time; del++;
+				k +=2;
+			}
+
+			// fill again:
+			for (i in 0...size>>1) {
+				time = Timer.stamp(); v.add("c"); add_time += Timer.stamp() - time; add++;
+			}
+
+			// delete all keys:
+			for (i in 0...size) {
+				time = Timer.stamp(); v.del(i); del_time += Timer.stamp() - time; del++;
+			}
+			
+		}
 		
-		time = Std.int((Timer.stamp() - time)*1000);
-		#if viktor_safe
-		haxe.Log.trace("safe mode");
-		#end
+		add_time = Std.int(add_time*1000);
+		del_time = Std.int(del_time*1000);
 
 		// output separate times for each operation:
-		// haxe.Log.trace('add:\t${time}\tms' , #if (haxe_ver >= "4.0.0") null #else {fileName:"",lineNumber:0,className:"",methodName:"",customParams:[]} #end);
+		haxe.Log.trace('$add add:\t${add_time}\tms' , null);
+		haxe.Log.trace('$del del:\t${del_time}\tms' , null);
 	}
 	
 }
