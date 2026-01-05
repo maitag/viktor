@@ -97,7 +97,7 @@ class Test extends hxp.Script {
 		base.define("no-deprecation-warnings"); // need for old unit-test
 		#end
 
-		if (flags.get("safe")) base.define("viktor_unsafe");
+		if (flags.get("safe")) base.define("viktor_safe");
 		
 		for (target in targets) {
 			Log.info("build " + target + " target...");
@@ -120,7 +120,7 @@ class Test extends hxp.Script {
 			//,debug: true
 		});
 
-		if (flags.get("safe")) base.define("viktor_unsafe");
+		if (flags.get("safe")) base.define("viktor_safe");
 		
 		for (benchmark in benchmarks)
 		{

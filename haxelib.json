@@ -4,9 +4,9 @@
 	"license": "MIT",
 	"tags": ["datastructure", "ds", "optimization", "pure", "peote"],
 	"description": "datastructures to store a set of values by id (optimized add/del, slow into iteration instead.)",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"classPath": "src/",
-	"releasenote": "everytime magically again about doing something new^^",
+	"releasenote": "adding unit tests",
 	"contributors": ["maitag"],
 	"dependencies": {}
 }

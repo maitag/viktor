@@ -78,6 +78,7 @@ class ViktorT<T> {
 	**/
 	public inline function set(key:Int, value:T) {
 		#if viktor_safe
+		if (value == null) throw("Values in ViktorT can not be 'null', use ViktoriaT instead!");
 		if (!exist(key)) throw("The key must already exist to set a new value.");
 		#end
 		list.set(key, value);
@@ -92,6 +93,10 @@ class ViktorT<T> {
 		#if viktor_safe
 		if (!exist(key)) throw("The key must already exist to delete it.");
 		#end
+		_del(key);
+	}
+
+	public inline function _del(key:Int) {
 		list.set(key, null);
 		if (key == pos-1) pos--;
 		else freeKeys.set(++posFree, key);
@@ -104,7 +109,7 @@ class ViktorT<T> {
 	**/
 	public inline function remove(value:T):Int {
 		var i:Int = key(value);
-		if (i >= 0) del(i);
+		if (i >= 0) _del(i);
 		return i;
 	}
 
@@ -207,7 +212,7 @@ class ViktorTIterator<T> {
 	**/
 	public inline function new(viktor:ViktorT<T>, from:Int, to:Int) {
 		#if viktor_safe
-		if (from < 0 || from >= to || to > viktor.size) throw("Iterator out of bounds.");
+		if (from < 0 || from > to || to > viktor.size) throw("Iterator out of bounds.");
 		#end
 		this.viktor = viktor;
 		i = from;
@@ -238,7 +243,7 @@ class ViktorTKeyValueIterator<T> {
 	**/
 	public inline function new(viktor:ViktorT<T>, from:Int, to:Int) {
 		#if viktor_safe
-		if (from < 0 || from >= to || to > viktor.size) throw("Iterator out of bounds.");
+		if (from < 0 || from > to || to > viktor.size) throw("Iterator out of bounds.");
 		#end
 		this.viktor = viktor;
 		i = from;

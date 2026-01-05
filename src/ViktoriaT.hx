@@ -90,6 +90,10 @@ class ViktoriaT<T> {
 		#if viktor_safe
 		if (!exist(key)) throw("The key must already exist to delete it.");
 		#end
+		_del(key);
+	}
+
+	public inline function _del(key:Int) {
 		if (key == pos-1) pos--;
 		else freeKeys.set(++posFree, key);
 	}
@@ -101,7 +105,7 @@ class ViktoriaT<T> {
 	**/
 	public inline function remove(value:T):Int {
 		var i:Int = key(value);
-		if (i >= 0) del(i);
+		if (i >= 0) _del(i);
 		return i;
 	}
 
@@ -205,7 +209,9 @@ class ViktoriaTIterator<T> {
 		@param to iteration end value
 	**/
 	public inline function new(viktoria:ViktoriaT<T>, from:Int, to:Int) {
-		if (from < 0 || from >= to || to > viktoria.size) throw("Iterator out of bounds");
+		#if viktor_safe
+		if (from < 0 || from > to || to > viktoria.size) throw("Iterator out of bounds");
+		#end
 		this.viktoria = viktoria;
 		i = from;
 		this.to = to;
@@ -234,7 +240,9 @@ class ViktoriaTKeyValueIterator<T> {
 		@param to iteration end value
 	**/
 	public inline function new(viktoria:ViktoriaT<T>, from:Int, to:Int) {
-		if (from < 0 || from >= to || to > viktoria.size) throw("Iterator out of bounds");
+		#if viktor_safe
+		if (from < 0 || from > to || to > viktoria.size) throw("Iterator out of bounds");
+		#end
 		this.viktoria = viktoria;
 		i = from;
 		this.to = to;

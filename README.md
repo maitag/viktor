@@ -90,7 +90,7 @@ trace(viktor.length); // -> 2
 ## Todo
 
 - more into synapsis
-- more unit tests and benchmarks
+- more into benchmarks
 - using Bytes and target specific backends instead of the Vector
 
   

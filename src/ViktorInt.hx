@@ -96,6 +96,10 @@ class ViktorInt {
 		#if viktor_safe
 		if (!exist(key)) throw("The key must already exist to delete it.");
 		#end
+		_del(key);
+	}
+
+	public inline function _del(key:Int) {
 		if (key == pos-1) pos--;
 		else {
 			list.set(key, NULL);
@@ -110,7 +114,7 @@ class ViktorInt {
 	**/
 	public inline function remove(value:Int):Int {
 		var i:Int = key(value);
-		if (i >= 0) del(i);
+		if (i >= 0) _del(i);
 		return i;
 	}
 
@@ -212,7 +216,9 @@ class ViktorIntIterator {
 		@param to iteration end value
 	**/
 	public inline function new(viktorInt:ViktorInt, from:Int, to:Int) {
-		if (from < 0 || from >= to || to > viktorInt.size) throw("Iterator out of bounds");
+		#if viktor_safe
+		if (from < 0 || from > to || to > viktorInt.size) throw("Iterator out of bounds");
+		#end
 		this.viktorInt = viktorInt;
 		i = from;
 		this.to = to;
@@ -241,7 +247,9 @@ class ViktorIntKeyValueIterator {
 		@param to iteration end value
 	**/
 	public inline function new(viktorInt:ViktorInt, from:Int, to:Int) {
-		if (from < 0 || from >= to || to > viktorInt.size) throw("Iterator out of bounds");
+		#if viktor_safe
+		if (from < 0 || from > to || to > viktorInt.size) throw("Iterator out of bounds");
+		#end
 		this.viktorInt = viktorInt;
 		i = from;
 		this.to = to;
